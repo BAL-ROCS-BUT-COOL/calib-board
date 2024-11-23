@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 from enum import Enum 
 
 from calib_board.core.checkerboardGeometry import CheckerboardGeometry
-from calibCommons.viz.visualization_tools import plot_frame, get_color_from_id
-from calibCommons.utils.se3 import SE3
-from calibCommons.types import idtype
+from calib_commons.viz.visualization_tools import plot_frame, get_color_from_id
+from calib_commons.utils.se3 import SE3
+from calib_commons.types import idtype
 
 class CheckerboardMotion(Enum): 
     FREE = "Free"

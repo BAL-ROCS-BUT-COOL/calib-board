@@ -3,11 +3,11 @@ import numpy as np
 from pathlib import Path
 import cv2
 
-from calibCommons.data.load_calib import construct_cameras_intrinsics
-from calibCommons.data.data_pickle import save_to_pickle, load_from_pickle
-from calibCommons.eval_generic_scene import eval_generic_scene
-from calibCommons.scene import SceneType
-from calibCommons.viz import visualization as generic_vizualization
+from calib_commons.data.load_calib import construct_cameras_intrinsics
+from calib_commons.data.data_pickle import save_to_pickle, load_from_pickle
+from calib_commons.eval_generic_scene import eval_generic_scene
+from calib_commons.scene import SceneType
+from calib_commons.viz import visualization as generic_vizualization
 
 from calib_board.core.checkerboardGeometry import CheckerboardGeometry
 from calib_board.core.checkerboard import CheckerboardMotion

@@ -7,10 +7,10 @@ import numpy as np
 
 from calib_board.core.scene import SceneCheckerboard, SceneType
 from calib_board.core.correspondences import Correspondences
-from calibCommons.types import idtype
+from calib_commons.types import idtype
 
 # from boardCal.utils.evaluate_old import reprojection_error_per_view
-from calibCommons.viz.visualization_tools import get_color_from_id, get_color_from_error
+from calib_commons.viz.visualization_tools import get_color_from_id, get_color_from_error
 
 # from boardCal.utils.evaluate_old import get_errors_x_y_in_cam
 

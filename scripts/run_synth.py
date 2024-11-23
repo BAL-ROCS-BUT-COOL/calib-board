@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np 
 from pathlib import Path
 
-from calibCommons.data.data_pickle import save_to_pickle
-from calibCommons.eval_generic_scene import eval_generic_scene
-from calibCommons.scene import SceneType
-from calibCommons.viz import visualization as generic_vizualization
+from calib_commons.data.data_pickle import save_to_pickle
+from calib_commons.eval_generic_scene import eval_generic_scene
+from calib_commons.scene import SceneType
+from calib_commons.viz import visualization as generic_vizualization
 
 from calib_board.core.checkerboardGeometry import CheckerboardGeometry
 from calib_board.core.checkerboard import CheckerboardMotion

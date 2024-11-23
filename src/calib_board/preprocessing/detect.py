@@ -6,7 +6,7 @@ from typing import Dict, List, Optional, Union
 from enum import Enum
 from tqdm import tqdm
 
-from calibCommons.data.load_calib import load_intrinsics
+from calib_commons.data.load_calib import load_intrinsics
 from calib_board.core.observationCheckerboard import ObservationCheckerboard
 
 

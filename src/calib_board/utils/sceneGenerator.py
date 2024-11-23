@@ -4,18 +4,18 @@ import numpy as np
 from scipy.spatial.transform import Rotation 
 
 
-from calibCommons.camera import Camera
-from calibCommons.intrinsics import Intrinsics
-from calibCommons.types import idtype
+from calib_commons.camera import Camera
+from calib_commons.intrinsics import Intrinsics
+from calib_commons.types import idtype
 
 from calib_board.core.scene import SceneCheckerboard
 from calib_board.core.scene import SceneType
 from calib_board.core.checkerboardGeometry import CheckerboardGeometry
 from calib_board.core.checkerboard import Checkerboard, CheckerboardMotion
 
-from calibCommons.utils.generateCircularCameras import generateCircularCameras
-from calibCommons.utils.se3 import *
-from calibCommons.utils.so3 import *
+from calib_commons.utils.generateCircularCameras import generateCircularCameras
+from calib_commons.utils.se3 import *
+from calib_commons.utils.so3 import *
 
 class SceneGenerator: 
 

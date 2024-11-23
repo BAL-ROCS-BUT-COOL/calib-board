@@ -1,12 +1,12 @@
 from typing import List, Dict
 import numpy as np
 
-from calibCommons.types import idtype
-from calibCommons.utils.se3 import q_from_T
-from calibCommons.camera import Camera
-from calibCommons.intrinsics import Intrinsics
-from calibCommons.scene import SceneType
-from calibCommons.data.data_json import save_cameras_poses_to_json
+from calib_commons.types import idtype
+from calib_commons.utils.se3 import q_from_T
+from calib_commons.camera import Camera
+from calib_commons.intrinsics import Intrinsics
+from calib_commons.scene import SceneType
+from calib_commons.data.data_json import save_cameras_poses_to_json
 
 from calib_board.core.checkerboard import Checkerboard
 from calib_board.core.correspondences import Correspondences

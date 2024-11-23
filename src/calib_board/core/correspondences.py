@@ -2,7 +2,7 @@ from typing import Dict, List
 import numpy as np
 
 from calib_board.core.observationCheckerboard import ObservationCheckerboard
-from calibCommons.types import idtype
+from calib_commons.types import idtype
 
 
 Correspondences = Dict[idtype, Dict[idtype, ObservationCheckerboard]]

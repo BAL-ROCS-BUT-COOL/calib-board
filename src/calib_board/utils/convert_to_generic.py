@@ -2,9 +2,9 @@ import numpy as np
 
 from calib_board.core.scene import SceneCheckerboard
 
-from calibCommons.scene import Scene, SceneType
-from calibCommons.objectPoint import ObjectPoint
-from calibCommons.observation import Observation
+from calib_commons.scene import Scene, SceneType
+from calib_commons.objectPoint import ObjectPoint
+from calib_commons.observation import Observation
 
 def convert_checker_scene_to_generic_scene(checker_scene: Scene, scene_type):
 
