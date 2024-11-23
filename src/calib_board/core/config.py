@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
 
-from boardCal.core.checkerboard import CheckerboardMotion
-from boardCal.core.checkerboardGeometry import CheckerboardGeometry
+from calib_board.core.checkerboard import CheckerboardMotion
+from calib_board.core.checkerboardGeometry import CheckerboardGeometry
 
 
 @dataclass

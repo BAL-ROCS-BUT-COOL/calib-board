@@ -8,10 +8,10 @@ from calibCommons.camera import Camera
 from calibCommons.intrinsics import Intrinsics
 from calibCommons.types import idtype
 
-from boardCal.core.scene import SceneCheckerboard
-from boardCal.core.scene import SceneType
-from boardCal.core.checkerboardGeometry import CheckerboardGeometry
-from boardCal.core.checkerboard import Checkerboard, CheckerboardMotion
+from calib_board.core.scene import SceneCheckerboard
+from calib_board.core.scene import SceneType
+from calib_board.core.checkerboardGeometry import CheckerboardGeometry
+from calib_board.core.checkerboard import Checkerboard, CheckerboardMotion
 
 from calibCommons.utils.generateCircularCameras import generateCircularCameras
 from calibCommons.utils.se3 import *

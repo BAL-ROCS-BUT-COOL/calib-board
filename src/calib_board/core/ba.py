@@ -1,7 +1,7 @@
 import scipy.sparse
 import numpy as np
 
-from boardCal.core.checkerboard import CheckerboardMotion
+from calib_board.core.checkerboard import CheckerboardMotion
 
 def cost_function_ba(x, 
                                 num_cameras, 

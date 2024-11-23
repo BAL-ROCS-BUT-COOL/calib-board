@@ -5,8 +5,8 @@ from matplotlib import rcParams
 import math 
 import numpy as np
 
-from boardCal.core.scene import SceneCheckerboard, SceneType
-from boardCal.core.correspondences import Correspondences
+from calib_board.core.scene import SceneCheckerboard, SceneType
+from calib_board.core.correspondences import Correspondences
 from calibCommons.types import idtype
 
 # from boardCal.utils.evaluate_old import reprojection_error_per_view

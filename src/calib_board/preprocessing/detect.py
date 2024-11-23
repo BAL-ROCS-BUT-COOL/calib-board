@@ -7,7 +7,7 @@ from enum import Enum
 from tqdm import tqdm
 
 from calibCommons.data.load_calib import load_intrinsics
-from boardCal.core.observationCheckerboard import ObservationCheckerboard
+from calib_board.core.observationCheckerboard import ObservationCheckerboard
 
 
 class BoardType(Enum): 

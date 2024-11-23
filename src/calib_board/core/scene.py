@@ -8,10 +8,10 @@ from calibCommons.intrinsics import Intrinsics
 from calibCommons.scene import SceneType
 from calibCommons.data.data_json import save_cameras_poses_to_json
 
-from boardCal.core.checkerboard import Checkerboard
-from boardCal.core.correspondences import Correspondences
-from boardCal.core.observationCheckerboard import ObservationCheckerboard
-from boardCal.utils.utils import is_chessboard_visible
+from calib_board.core.checkerboard import Checkerboard
+from calib_board.core.correspondences import Correspondences
+from calib_board.core.observationCheckerboard import ObservationCheckerboard
+from calib_board.utils.utils import is_chessboard_visible
 
 
 

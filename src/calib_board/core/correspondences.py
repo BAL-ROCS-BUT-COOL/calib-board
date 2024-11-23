@@ -1,7 +1,7 @@
 from typing import Dict, List
 import numpy as np
 
-from boardCal.core.observationCheckerboard import ObservationCheckerboard
+from calib_board.core.observationCheckerboard import ObservationCheckerboard
 from calibCommons.types import idtype
 
 

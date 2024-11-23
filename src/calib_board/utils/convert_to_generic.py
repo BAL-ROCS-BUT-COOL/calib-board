@@ -1,6 +1,6 @@
 import numpy as np
 
-from boardCal.core.scene import SceneCheckerboard
+from calib_board.core.scene import SceneCheckerboard
 
 from calibCommons.scene import Scene, SceneType
 from calibCommons.objectPoint import ObjectPoint

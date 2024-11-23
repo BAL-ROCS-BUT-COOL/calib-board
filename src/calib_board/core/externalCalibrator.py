@@ -18,13 +18,13 @@ from calibCommons.types import idtype
 from calibCommons.utils.se3 import SE3
 from calibCommons.world_frame import WorldFrame
 
-from boardCal.core import ba 
-from boardCal.core.correspondences import Correspondences, get_conform_views_of_cam, get_tracks, filter_with_track_length
-from boardCal.core.checkerboard import CheckerboardMotion
-from boardCal.core.observationCheckerboard import ObservationCheckerboard
-from boardCal.core.scene import SceneCheckerboard, SceneType
-from boardCal.core.checkerboard import Checkerboard
-from boardCal.core.config import ExternalCalibratorConfig
+from calib_board.core import ba 
+from calib_board.core.correspondences import Correspondences, get_conform_views_of_cam, get_tracks, filter_with_track_length
+from calib_board.core.checkerboard import CheckerboardMotion
+from calib_board.core.observationCheckerboard import ObservationCheckerboard
+from calib_board.core.scene import SceneCheckerboard, SceneType
+from calib_board.core.checkerboard import Checkerboard
+from calib_board.core.config import ExternalCalibratorConfig
 
 
 class ExternalCalibrator: 

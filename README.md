@@ -1,7 +1,7 @@
 
-# calibBoard
+# calib-board
 
-**calibBoard** .
+**calib-board** .
 
 ## Features
 
@@ -11,24 +11,24 @@
 
 ### 1. Clone the Repository
 
-Clone the `calibBoard` repository from GitHub:
+Clone the `calib-board` repository from GitHub:
 
 ```bash
-git clone https://github.com/tflueckiger/calibBoard.git
+git clone https://github.com/tflueckiger/calib-board.git
 ```
 
 
 ### 2. Navigate to the Project Directory
 
-Change into the `calibBoard` directory:
+Change into the `calib-board` directory:
 
 ```bash
-cd calibBoard
+cd calib-board
 ```
 
 ### 3. Install the Package
 
-Finally, install the `calibBoard` package:
+Finally, install the `calib-board` package:
 
 ```bash
 pip install .
