@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "boardCal"
+version = "0.1.0"
+description = "A package for external calibration of multi-camera systems using a calibration board."
+authors = [
+    { name = "Flueckiger Tim", email = "timflueckiger@outlook.com" }
+]
+dependencies = [
+    "numpy",
+    "opencv-python",
+    "scipy",
+    "matplotlib",
+    "tqdm",
+    { url = "git+https://github.com/your-username/calibCommons.git" }
+]
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent"
+]

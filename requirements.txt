@@ -1,0 +1,6 @@
+numpy
+opencv-python
+scipy
+matplotlib
+tqdm
+git+https://github.com/your-username/calibCommons.git
