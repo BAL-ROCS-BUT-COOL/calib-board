@@ -9,14 +9,14 @@ from calibCommons.eval_generic_scene import eval_generic_scene
 from calibCommons.scene import SceneType
 from calibCommons.viz import visualization as generic_vizualization
 
-from boardCal.core.checkerboardGeometry import CheckerboardGeometry
-from boardCal.core.checkerboard import CheckerboardMotion
-from boardCal.core.config import ExternalCalibratorConfig
-from boardCal.core.externalCalibrator import ExternalCalibrator, WorldFrame
-from boardCal.core.correspondences import filter_correspondences_with_track_length, filter_correspondences_with_non_nan_points
-from boardCal.preprocessing.detect import detect_board_corners, BoardType
-from boardCal.utils.convert_to_generic import convert_checker_scene_to_generic_scene, convert_to_generic_correspondences
-from boardCal.utils import visualization
+from calibBoard.core.checkerboardGeometry import CheckerboardGeometry
+from calibBoard.core.checkerboard import CheckerboardMotion
+from calibBoard.core.config import ExternalCalibratorConfig
+from calibBoard.core.externalCalibrator import ExternalCalibrator, WorldFrame
+from calibBoard.core.correspondences import filter_correspondences_with_track_length, filter_correspondences_with_non_nan_points
+from calibBoard.preprocessing.detect import detect_board_corners, BoardType
+from calibBoard.utils.convert_to_generic import convert_checker_scene_to_generic_scene, convert_to_generic_correspondences
+from calibBoard.utils import visualization
 
 
 # random seed

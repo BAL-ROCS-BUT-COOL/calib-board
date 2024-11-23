@@ -3,4 +3,4 @@ opencv-python
 scipy
 matplotlib
 tqdm
-git+https://github.com/your-username/calibCommons.git
+git+https://github.com/tflueckiger/calibCommons.git
