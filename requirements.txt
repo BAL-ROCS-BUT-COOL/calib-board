@@ -3,4 +3,3 @@ opencv-python
 scipy
 matplotlib
 tqdm
-git+https://github.com/tflueckiger/calib-commons.git

@@ -1,24 +1,24 @@
 {
     "per_camera_group": {
         "all": {
-            "mean_error": 0.4534236299777672,
-            "std_error": 0.22693237317014756,
-            "mean_view_score": 100.0,
-            "mean_n_corres": 37.5
+            "mean_error": 0.5317353417181874,
+            "std_error": 0.2127761808660301,
+            "mean_view_score": 89.0,
+            "mean_n_corres": 23.0
         }
     },
     "per_camera": {
         "2": {
-            "mean_error": 0.46644385125156423,
-            "std_error": 0.23066746655650594,
+            "mean_error": 0.5210266907903753,
+            "std_error": 0.21291093901863364,
             "view_score": 74,
-            "n_corres": 42
+            "n_corres": 22
         },
         "1": {
-            "mean_error": 0.436852439265662,
-            "std_error": 0.22098103863196358,
-            "view_score": 126,
-            "n_corres": 33
+            "mean_error": 0.5415516050686818,
+            "std_error": 0.21217832304712578,
+            "view_score": 104,
+            "n_corres": 24
         }
     },
     "success_rate": {
