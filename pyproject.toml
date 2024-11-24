@@ -15,7 +15,7 @@ dependencies = [
     "scipy",
     "matplotlib",
     "tqdm", 
-    "calib-commons @ git+https://github.com/tflueckiger/calib-commons.git"
+    "calib_commons @ git+https://github.com/tflueckiger/calib-commons.git"
 ]
 requires-python = ">=3.8"
 classifiers = [
