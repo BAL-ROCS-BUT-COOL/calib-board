@@ -14,7 +14,8 @@ dependencies = [
     "opencv-python",
     "scipy",
     "matplotlib",
-    "tqdm"
+    "tqdm", 
+    "calib-commons @ git+https://github.com/tflueckiger/calib-commons.git"
 ]
 requires-python = ">=3.8"
 classifiers = [

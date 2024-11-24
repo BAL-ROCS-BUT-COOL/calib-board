@@ -33,7 +33,7 @@ Finally, install the `calib-board` package:
 ```bash
 pip install .
 ```
-
+pip install -e . --config-settings editable_mode=strict
 ## Usage
 
 ## License
