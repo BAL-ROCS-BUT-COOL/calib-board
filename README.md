@@ -21,7 +21,7 @@ A Python package for performing **external calibration** of multi-camera systems
    pip install -e . --config-settings editable_mode=strict
    ```
 
-> Dependencies, including utilities from [`calib-commons`](https://github.com/tflueckiger/calib-commons), are automatically installed.
+> Dependencies: if dependencies listed in requirements.txt are not satisfied, they will be automatically installed from PyPi. In addition, the custom package [`calib-commons`](https://github.com/tflueckiger/calib-commons), is automatically installed.
 
 ---
 
@@ -66,11 +66,11 @@ intrinsics_directory/
 └── ...
 ```
 
-Generate intrinsics using the `calib-commons` toolbox, which includes a `calibrate-intrinsics` command-line tool for automatic internal calibration.
+This can be done using using the `calib-commons` toolbox, which includes a `calibrate-intrinsics` command-line tool for automatic internal calibration of multiple cameras using either videos recordings or images. The tool creates a folder containing camera intrinsics in JSON files matching the required format.
 
 ---
 
-## **Generating Intrinsics with Calib-Commons**
+## **Generating Intrinsics with calibrate-intrinsics**
 
 ### **Option 1: Using Video Recordings**
 
@@ -129,6 +129,8 @@ Generate intrinsics using the `calib-commons` toolbox, which includes a `calibra
    calibrate-intrinsics --square_size 0.03 --chessboard_width 11 --chessboard_height 8
    ```
 
+> Note that in this case the recordings are independent (no temporal synchronization required) and that the naming of the frames is free.
+
 > For detailed usage, run `calibrate-intrinsics --help`.
 
 ---
@@ -146,6 +148,8 @@ Once prerequisites are met, perform external calibration:
    ```bash
    python scripts/run.py
    ```
+The camera poses are saved in results/camera_poses.json.
+
 
 ---
 
