@@ -23,10 +23,10 @@ np.random.seed(1)
 ############################### USER INTERFACE ####################################
 
 # SYNTHETIC SCENE GENERATION PARAMETERS
-numCheckerboards = 2
+numCheckerboards = 100
 checkerboard_motion = CheckerboardMotion.FREE # CheckerboardMotion.PLANAR or CheckerboardMotion.FREE
-checkerboard_motion_range = 1 # [m]
-num_cameras = 2
+checkerboard_motion_range = 0.7 # [m]
+num_cameras = 6
 distance_cameras = 2 # [m]
 tilt_cameras = 45 * np.pi / 180 # [rad]
 noise_std = 0.5 # [pix]
