@@ -1,44 +1,42 @@
+# **Calib-Board**
 
-# calib-board
+A Python package for performing **external calibration** of multi-camera systems using synchronized images of a moving calibration pattern (e.g., chessboard or ChArUco) from internally calibrated cameras.
 
-**calib-board** .
+---
 
-## Features
 
-- **ddd**: ddd.
+## **Installation**
 
-## Installation
+1. Clone the repository:
 
-### 1. Clone the Repository
+   ```bash
+   git clone https://github.com/tflueckiger/calib-board.git
+   cd calib-board
+   pip install .
+   ```
 
-Clone the `calib-board` repository from GitHub:
+2. Optional: Install in editable mode:
 
-```bash
-git clone https://github.com/tflueckiger/calib-board.git
-cd calib-board
-pip install .
-```
+   ```bash
+   pip install -e . --config-settings editable_mode=strict
+   ```
 
-Note: this command will automatically trigger the install of the dependencies from PyPi if not satisfied (see requirements.txt)
-In addition, this package uses utilities from the custom package calib-commons (https://github.com/tflueckiger/calib-commons), which is also automatically installed.
+> Dependencies, including utilities from [`calib-commons`](https://github.com/tflueckiger/calib-commons), are automatically installed.
 
-If you want to install the package in the editable mode, add the option:
-```bash
-pip install -e . --config-settings editable_mode=strict
-```
+---
 
-## Usage
+## **Prerequisites**
 
-The toolbox requires:
+Ensure you have the following before running the package:
 
-1. **Synchronized images from all cameras**
-2. **Internal parameters (=intrinsics) for each camera**
+1. **Synchronized Images from All Cameras**  
+2. **Internal Camera Parameters (Intrinsics)**  
 
-**1. Synchronized Images from All Cameras**
+### **1. Synchronized Images**
 
-Ensure that your images are temporally synchronized and organized within a directory as follows:
+Organize synchronized images in a directory with the following structure:
 
-```
+```plaintext
 images_directory/
 ├── camera1/
 │   ├── 1.jpg
@@ -54,32 +52,109 @@ images_directory/
     └── ...
 ```
 
-Each subdirectory (`camera1`, `camera2`, ..., `cameraN`) corresponds to a different camera and contains its respective images. The filenames should be consistent across all camera folders to reflect the synchronization. For example, `1.jpg` in `camera1` should correspond to `1.jpg` in `camera2`, and so on.
+- Each subdirectory (`camera1`, `camera2`, ..., `cameraN`) contains images for a single camera.
+- Filenames **must match across cameras** to ensure synchronization (e.g., `1.jpg` in `camera1` corresponds to `1.jpg` in `camera2`).
 
-**2. Intrinsic Parameters for Each Camera**
+### **2. Camera Intrinsics**
 
-Provide the intrinsic parameters for each camera in a structured format, such as JSON or YAML. These files should be named to correspond with their respective camera directories and placed in a directory :
+Place intrinsics for each camera in a directory like this:
 
-```
+```plaintext
 intrinsics_directory/
-│   ├── camera1_intrinsics.json
-│   ├── camera2_intrinsics.json
-│   └── ...
-│   └── cameraN_intrinsics.json
+├── camera1_intrinsics.json
+├── camera2_intrinsics.json
+└── ...
 ```
 
+Generate intrinsics using the `calib-commons` toolbox, which includes a `calibrate-intrinsics` command-line tool for automatic internal calibration.
 
-The main script to run the calibration is scripts/run.py
+---
 
+## **Generating Intrinsics with Calib-Commons**
 
-First, modify the pre-processing parameters (board detection) and calibration parameters in the section USER INTERFACE. 
+### **Option 1: Using Video Recordings**
 
+1. Place video recordings of a moving chessboard in a common directory:
 
+   ```plaintext
+   data_directory/
+   ├── camera1.mp4
+   ├── camera2.mp4
+   └── ...
+   ```
 
-## License
+2. Navigate to the directory:
 
-This project is licensed under the MIT License. See the [LICENSE](https://github.com/your-username/boardCal/blob/main/LICENSE) file for details.
+   ```bash
+   cd path_to_data_directory
+   ```
 
-## Acknowledgments
+3. Run the calibration command:
 
+   ```bash
+   calibrate-intrinsics --use_videos --square_size 0.03 --chessboard_width 11 --chessboard_height 8 --sampling_step 45
+   ```
 
+---
+
+### **Option 2: Using Images**
+
+1. Organize images into subfolders, one per camera:
+
+   ```plaintext
+   data_directory/
+   ├── camera1/
+   │   ├── frame1.jpg
+   │   ├── frame2.jpg
+   │   └── ...
+   ├── camera2/
+   │   ├── frame1.jpg
+   │   ├── frame2.jpg
+   │   └── ...
+   └── cameraN/
+       ├── frame1.jpg
+       ├── frame2.jpg
+       └── ...
+   ```
+
+2. Navigate to the directory:
+
+   ```bash
+   cd path_to_data_directory
+   ```
+
+3. Execute the calibration command:
+
+   ```bash
+   calibrate-intrinsics --square_size 0.03 --chessboard_width 11 --chessboard_height 8
+   ```
+
+> For detailed usage, run `calibrate-intrinsics --help`.
+
+---
+
+## **Usage**
+
+Once prerequisites are met, perform external calibration:
+
+1. Edit the user interface parameters in `scripts/run.py`:
+   - **Board Detection Parameters**: Configure settings for detecting the calibration pattern.
+   - **Calibration Algorithm Parameters**: Adjust algorithm settings.
+
+2. Run the script:
+
+   ```bash
+   python scripts/run.py
+   ```
+
+---
+
+## **License**
+
+This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/tflueckiger/calib-board/blob/main/LICENSE) file for details.
+
+---
+
+## **Acknowledgments**
+
+TODO
