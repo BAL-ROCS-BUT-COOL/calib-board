@@ -21,7 +21,25 @@ A Python package for performing **external calibration** of multi-camera systems
    pip install -e . --config-settings editable_mode=strict
    ```
 
-> Dependencies: if dependencies listed in requirements.txt are not satisfied, they will be automatically installed from PyPi. In addition, the custom package [`calib-commons`](https://github.com/tflueckiger/calib-commons), is automatically installed.
+### Dependencies
+The package depends on the custom utilities Python package [`calib-commons`](https://github.com/tflueckiger/calib-commons). To install it:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/tflueckiger/calib-commons.git
+   cd calib-commons
+   pip install .
+   ```
+
+2. Optional: Install in editable mode:
+
+   ```bash
+   pip install -e . --config-settings editable_mode=strict
+   ```
+
+> Dependencies: if the additional dependencies listed in requirements.txt are not satisfied, they will be automatically installed from PyPi. 
+
 
 ---
 

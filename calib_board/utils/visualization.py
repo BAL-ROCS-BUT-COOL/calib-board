@@ -90,7 +90,7 @@ def visualize_scenes(scenes: List[SceneCheckerboard],
     for scene in scenes: 
         get_coords(scene, x,y,z)
 
-    x_min = min(x)
+    x_min = min(x)                          
     x_max = max(x)
 
     y_min = min(y)

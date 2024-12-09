@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "calib_board"
-version = "0.1.0"
+version = "0.2.0"
 description = "A package for external calibration of multi-camera systems using a calibration board."
 authors = [
     { name = "Flueckiger Tim", email = "timflueckiger@outlook.com" }
@@ -15,7 +15,8 @@ dependencies = [
     "scipy",
     "matplotlib",
     "tqdm", 
-    "calib_commons @ git+https://github.com/tflueckiger/calib-commons.git"
+    "calib_commons == 0.2.0" 
+    # "calib_commons @ git+https://github.com/tflueckiger/calib-commons.git"
 ]
 requires-python = ">=3.8"
 classifiers = [

@@ -2,6 +2,7 @@ import json
 import numpy as np
 import copy
 
+from calib_board.core.observationCheckerboard import ObservationCheckerboard
 
 def is_chessboard_visible(camera_pose: np.ndarray, chessboard_pose: np.ndarray) -> bool:
     """
@@ -40,3 +41,12 @@ def is_chessboard_visible(camera_pose: np.ndarray, chessboard_pose: np.ndarray) 
 
     # Step 7: Check if the chessboard is facing the camera (dot_product > 0 means visible)
     return dot_product > 0
+
+
+def convert_correspondences_array_to_checker_correspondences(correspondences): 
+    correspondences_checker = {}
+    for cam in correspondences:
+        correspondences_checker[cam] = {}
+        for checker_id, _2d in correspondences[cam].items():
+                correspondences_checker[cam][checker_id] = ObservationCheckerboard(_2d)
+    return correspondences_checker

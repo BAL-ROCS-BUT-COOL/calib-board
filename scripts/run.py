@@ -8,15 +8,17 @@ from calib_commons.data.data_pickle import save_to_pickle, load_from_pickle
 from calib_commons.eval_generic_scene import eval_generic_scene
 from calib_commons.scene import SceneType
 from calib_commons.viz import visualization as generic_vizualization
+from calib_commons.utils.detect_board import detect_board_corners, BoardType
 
 from calib_board.core.checkerboardGeometry import CheckerboardGeometry
 from calib_board.core.checkerboard import CheckerboardMotion
 from calib_board.core.config import ExternalCalibratorConfig
 from calib_board.core.externalCalibrator import ExternalCalibrator, WorldFrame
 from calib_board.core.correspondences import filter_correspondences_with_track_length, filter_correspondences_with_non_nan_points
-from calib_board.preprocessing.detect import detect_board_corners, BoardType
 from calib_board.utils.convert_to_generic import convert_checker_scene_to_generic_scene, convert_to_generic_correspondences
+from calib_board.utils.utils import convert_correspondences_array_to_checker_correspondences
 from calib_board.utils import visualization
+
 
 
 # random seed
@@ -67,7 +69,7 @@ if board_type == BoardType.CHARUCO:
 else: 
     charuco_detector = None
 
-correspondences = detect_board_corners(images_parent_folder=images_parent_folder,
+correspondences_nparray = detect_board_corners(images_parent_folder=images_parent_folder,
                                         board_type=board_type,
                                         charuco_detector=charuco_detector,
                                         columns=checkerboard_geometry.columns, 
@@ -76,8 +78,9 @@ correspondences = detect_board_corners(images_parent_folder=images_parent_folder
                                         undistort=True, 
                                         display=show_detection_images, 
                                         save_images_with_overlayed_detected_corners=save_detection_images)
+correspondences = convert_correspondences_array_to_checker_correspondences(correspondences_nparray)
 
-# # save_to_pickle(out_folder_calib / "correspondences_detected.pkl", correspondences)
+    # # save_to_pickle(out_folder_calib / "correspondences_detected.pkl", correspondences)
 # # correspondences = load_from_pickle("results/correspondences_detected.pkl")
 
 
