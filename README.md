@@ -7,21 +7,9 @@ A Python package for performing **external calibration** of multi-camera systems
 
 ## **Installation**
 
-1. Clone the repository:
 
-   ```bash
-   git clone https://github.com/tflueckiger/calib-board.git
-   cd calib-board
-   pip install .
-   ```
 
-2. Optional: Install in editable mode:
-
-   ```bash
-   pip install -e . --config-settings editable_mode=strict
-   ```
-
-### Dependencies
+### Dependencies (calib-commons)
 The package depends on the custom utilities Python package [`calib-commons`](https://github.com/tflueckiger/calib-commons). To install it:
 
 1. Clone the repository:
@@ -40,7 +28,20 @@ The package depends on the custom utilities Python package [`calib-commons`](htt
 
 > Dependencies: if the additional dependencies listed in requirements.txt are not satisfied, they will be automatically installed from PyPi. 
 
+### Installation of calib-board
+1. Clone the repository:
 
+   ```bash
+   git clone https://github.com/tflueckiger/calib-board.git
+   cd calib-board
+   pip install .
+   ```
+
+2. Optional: Install in editable mode:
+
+   ```bash
+   pip install -e . --config-settings editable_mode=strict
+   ```
 ---
 
 ## **Prerequisites**
