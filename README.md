@@ -119,8 +119,25 @@ In addition, the following **metrics** 🎯, per camera and overall, are saved i
 
 > The *number of correspondences* of a camera corresponds to the number of conform observations a camera has of object (=3D) points with a track length higher or equal to 2. 
 
-> The *track* of an object (=3D) point is the set of cameras in which the point is observed, and for which the observation is conform. 
+> The *track* of an object (=3D) point is the set of cameras in which the point is observed, and for which the observation is conform.
 
+ 
+
+<figure style="text-align: center;">
+    <img src="https://github.com/user-attachments/assets/238b9ebf-ac48-402e-b448-75916ae1068c" alt="Texte alternatif" style="width: 50%">
+</figure>
+<!-- 
+<figure style="text-align: center;">
+    <img src="https://github.com/user-attachments/assets/db46b25b-18d9-4d9a-842d-007b8ee50a25" alt="Texte alternatif" style="width: 50%">
+</figure>
+<figure style="text-align: center;">
+    <img src="https://github.com/user-attachments/assets/6a8b1495-f0c8-44b2-9c39-63f5c33c41a5" alt="Texte alternatif" style="width: 50%">
+</figure>
+-->
+
+| Reprojections and observations                           | Reprojection errors                            |
+| ----------------------------------- | ----------------------------------- |
+| ![Description de l'image 1](https://github.com/user-attachments/assets/db46b25b-18d9-4d9a-842d-007b8ee50a25)  | ![Description de l'image 2](https://github.com/user-attachments/assets/6a8b1495-f0c8-44b2-9c39-63f5c33c41a5)  |
 ---
 
 ---
