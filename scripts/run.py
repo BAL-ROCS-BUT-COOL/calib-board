@@ -55,7 +55,7 @@ external_calibrator_config = ExternalCalibratorConfig(
 )
 out_folder_calib = Path("results")
 show_viz = 1
-save_viz = 0
+save_viz = 1
 save_eval_metrics_to_json = 1
 
 
