@@ -2,6 +2,7 @@
 
 A Python package for performing **external calibration** 📐📷 of multi-camera systems using synchronized images⏱️ of a moving calibration pattern 🏁 (e.g., chessboard or ChArUco) from internally calibrated cameras 📷.
 
+
 ---
 
 
