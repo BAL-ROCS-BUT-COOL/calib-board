@@ -286,12 +286,13 @@ class ExternalCalibrator:
         # print(f"best inliers: {np.where(np.array(bestInliers))[0]}")
         T_C_W0 = se3.inv_T(best_cam_pose)
         rvec0, tvec0 = se3.rvec_tvec_from_T(T_C_W0)
+        ##
         rvec_, tvec_ = cv2.solvePnPRefineLM(objectPoints=_3d, 
                                             imagePoints=_2d, 
                                             cameraMatrix=self.intrinsics[cam_id].K, 
                                             distCoeffs=None, 
-                                            rvec=rvec0, 
-                                            tvec=tvec0)
+                                            rvec=rvec0[:,np.newaxis], 
+                                            tvec=tvec0[:,np.newaxis], )
         T_C_W = se3.T_from_rvec_tvec(rvec_, tvec_)
         T_W_C = se3.inv_T(T_C_W)
 

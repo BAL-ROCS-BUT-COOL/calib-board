@@ -20,6 +20,12 @@ def get_tracks(correspondences) -> Dict[idtype, set[idtype]]:
                     tracks[checker_id].add(camera_id)
                 else:
                     tracks[checker_id] = {camera_id}
+            else: 
+                if checker_id in tracks:
+                    pass
+                else:
+                    tracks[checker_id] = set()
+
     return tracks
 
 def filter_with_track_length(correspondences, checker_ids, min_track_length) -> set[idtype]: 
