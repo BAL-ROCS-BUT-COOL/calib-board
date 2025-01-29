@@ -46,21 +46,28 @@ The package depends on the custom utilities Python package 🧰 [`calib-commons`
    ```
 ---
 
+### Additional dependencies
+
+For video functionality, ``ffmpeg` is required. If not installed system-wide already, the easiest way by setting up everything in a `conda` environment and install using
+
+```bash
+conda install ffmpeg
+```
 
 ## **Documentation** 🗎
 
 ### 📝 **Prequisites**
 Ensure you have the following before running the package:
 
-1. **Synchronized Images from All Cameras** ⏱️📷
+1. **Synchronized Images/Videos from All Cameras** ⏱️📷
 2. **Internal Camera Parameters (Intrinsics)** ⚙️📷
 
-###  **1. Synchronized Images** ⏱️📷
+###  **1a. Synchronized Images** ⏱️📷
 
 Organize synchronized images in a directory with the following structure:
 
 ```plaintext
-images_directory/
+input_folder/
 ├── camera1/
 │   ├── 1.jpg
 │   ├── 2.jpg
@@ -78,9 +85,23 @@ images_directory/
 - Each subdirectory (`camera1`, `camera2`, ..., `cameraN`) contains images for a single camera.
 - Filenames **must match across cameras** to ensure synchronization (e.g., `1.jpg` in `camera1` corresponds to `1.jpg` in `camera2`).
 
+###  **1b. Synchronized Videos** ⏱️📷
+
+Alternatively, you can organize the folder using synchronized videos of all cameras:
+
+```plaintext
+input_folder/
+├── camera1.mp4
+├── camera2.mp4
+├── ...
+└── cameraN
+```
+¨
+This will accordingly extract frames using `ffmpeg` at the start of the main script and create the folder structure from above. Please make sure that `ffmpeg` is installed.
+
 ### **2. Camera Intrinsics** ⚙️📷
 
-Place intrinsics for each camera in a directory like this:
+Place intrinsics for each camera in a directory like this, making sure that the filenames match with the camera names in the input folder:
 
 ```plaintext
 intrinsics_directory/
@@ -97,16 +118,18 @@ intrinsics_directory/
 
 Once [prerequisites](#-prequisites) are met, perform external calibration:
 
-1. Edit the user interface parameters in `scripts/run.py`:
-   - **Board Detection Parameters**: Configure settings for detecting the calibration pattern.
-   - **Calibration Algorithm Parameters**: Adjust algorithm settings.
+```bash
+python scripts/run.py --input-folder <path_to_images_or_videos> --intrinsics-folder <path_to_intrinsics_folder>
+```
 
-2. Run the script:
+For processing time-synchronized videos, use the `--start_time_window` and ``--end_time_window` flags as well as `--sampling_step` to process only a subset of frames (i.e., where the calibration board is visible) and speed up the procedure.
 
-   ```bash
-   python scripts/run.py
-   ```
 
+```bash
+python scripts/run.py --input-folder <path_to_images_or_videos> --intrinsics-folder <path_to_intrinsics_folder> --start_time_window 00:32:00.0 --end_time_window 00:35:15.0 --sampling_step 10
+```
+
+For information on all configuration parameters, run `python scripts/run.py -h`.
 
 
 ### Output 📤
