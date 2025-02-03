@@ -67,3 +67,5 @@ class Config:
     save_viz:bool = True
     # Save evaluation metrics to json
     save_eval_metrics_to_json:bool = True
+    # Save COLMAP reconstruction
+    save_colmap_reconstruction:bool = False

@@ -109,6 +109,9 @@ print("correspondences saved to", correspondences_file)
 metrics = eval_generic_scene(generic_scene, generic_obsv, camera_groups=None, save_to_json=cfg.save_eval_metrics_to_json, output_path=cfg.out_folder_calib / "metrics.json", print_ = True)
 print("")
 
+if cfg.save_colmap_reconstruction:
+    generic_scene.save_colmap(cfg.out_folder_calib / "colmap")
+
 # Visualization
 if cfg.show_viz or cfg.save_viz:
     dpi = 300
