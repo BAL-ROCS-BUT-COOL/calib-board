@@ -32,6 +32,7 @@ cfg = tyro.cli(Config)
 cfg.input_folder = Path(cfg.input_folder)
 cfg.intrinsics_folder = Path(cfg.intrinsics_folder)
 cfg.out_folder_calib = Path(cfg.out_folder_calib)
+cfg.external_calibrator_config.checkerboard_geometry = cfg.checkerboard_geometry
 
 ###################### PRE-PROCESSING: SAMPLING FRAMES FROM VIDEO ###########################
 files = [f for f in cfg.input_folder.iterdir() if f.is_file()]
