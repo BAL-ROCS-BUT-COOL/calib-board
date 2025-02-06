@@ -48,14 +48,7 @@ class CheckerboardGeometry:
     columns: int
     square_size: float
 
-    def __init__(self, 
-                 rows: int,
-                 columns: int, 
-                 square_size: float):
-        self.rows = rows
-        self.columns = columns
-        self.square_size = square_size
-
+    def __post_init__(self):
         self._3d = self.__generate_corners_3d()
         self._3d_all = self.__generate_corners_3d_all()
         self._3d_augmented = self.generate_corners_3d_augmented()

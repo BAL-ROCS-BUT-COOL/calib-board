@@ -1,27 +1,26 @@
-import matplotlib.pyplot as plt
-import numpy as np 
 from pathlib import Path
-import cv2
 
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import tyro
+from calib_board.core.config import Config
+from calib_board.core.correspondences import (
+    filter_correspondences_with_non_nan_points,
+    filter_correspondences_with_track_length)
+from calib_board.core.externalCalibrator import ExternalCalibrator, WorldFrame
+from calib_board.utils import visualization
+from calib_board.utils.convert_to_generic import (
+    convert_checker_scene_to_generic_scene, convert_to_generic_correspondences)
+from calib_board.utils.utils import (
+    convert_correspondences_array_to_checker_correspondences,
+    extract_frames_from_video)
+from calib_commons.data.data_pickle import save_to_pickle
 from calib_commons.data.load_calib import construct_cameras_intrinsics
-from calib_commons.data.data_pickle import save_to_pickle, load_from_pickle
 from calib_commons.eval_generic_scene import eval_generic_scene
 from calib_commons.scene import SceneType
+from calib_commons.utils.detect_board import BoardType, detect_board_corners
 from calib_commons.viz import visualization as generic_vizualization
-from calib_commons.utils.detect_board import detect_board_corners, BoardType
-
-from calib_board.core.checkerboardGeometry import CheckerboardGeometry
-from calib_board.core.checkerboard import CheckerboardMotion
-from calib_board.core.config import ExternalCalibratorConfig
-from calib_board.core.externalCalibrator import ExternalCalibrator, WorldFrame
-from calib_board.core.correspondences import filter_correspondences_with_track_length, filter_correspondences_with_non_nan_points
-from calib_board.utils.convert_to_generic import convert_checker_scene_to_generic_scene, convert_to_generic_correspondences
-from calib_board.utils.utils import convert_correspondences_array_to_checker_correspondences, extract_frames_from_video
-from calib_board.utils import visualization
-from calib_board.utils.config import Config
-
-import tyro
-
 
 # random seed
 np.random.seed(1)

@@ -94,7 +94,7 @@ input_folder/
 ├── camera1.mp4
 ├── camera2.mp4
 ├── ...
-└── cameraN
+└── cameraN.mp4
 ```
 ¨
 This will accordingly extract frames using `ffmpeg` at the start of the main script and create the folder structure from above. Please make sure that `ffmpeg` is installed.

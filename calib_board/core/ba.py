@@ -113,6 +113,8 @@ def extract_all_poses_from_x(x: np.ndarray,
         other_checker_poses = np.einsum('ij,jkl->ikl', T_W_B1, compute_poses_from_6dof_vectorized(x[(num_cameras)*6:]))
     elif motion == CheckerboardMotion.PLANAR: 
         other_checker_poses = np.einsum('ij,jkl->ikl', T_W_B1, compute_poses_from_3dof_vectorized(x[(num_cameras)*6:]))
+    else:
+        raise ValueError(f"Unknown motion type {motion}.")
     checker_poses[:,:,1:] = other_checker_poses
     return camera_poses, checker_poses
 
