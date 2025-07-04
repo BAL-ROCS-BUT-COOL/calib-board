@@ -1,5 +1,7 @@
+from dataclasses import dataclass
 import numpy as np
 
+@dataclass
 class CheckerboardGeometry:
     """
     A class to represent the geometry of a checkerboard used for calibration.
@@ -42,14 +44,11 @@ class CheckerboardGeometry:
     get_num_corners() -> int:
         Returns the number of internal corners in the checkerboard.
     """
-    def __init__(self, 
-                 rows: int,
-                 columns: int, 
-                 square_size: float):
-        self.rows = rows
-        self.columns = columns
-        self.square_size = square_size
+    rows: int
+    columns: int
+    square_size: float
 
+    def __post_init__(self):
         self._3d = self.__generate_corners_3d()
         self._3d_all = self.__generate_corners_3d_all()
         self._3d_augmented = self.generate_corners_3d_augmented()

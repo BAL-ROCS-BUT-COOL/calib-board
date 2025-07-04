@@ -1,83 +1,74 @@
-import matplotlib.pyplot as plt
-import numpy as np 
 from pathlib import Path
-import cv2
 
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
+import tyro
+from calib_board.core.config import Config
+from calib_board.core.correspondences import (
+    filter_correspondences_with_non_nan_points,
+    filter_correspondences_with_track_length)
+from calib_board.core.externalCalibrator import ExternalCalibrator, WorldFrame
+from calib_board.utils import visualization
+from calib_board.utils.convert_to_generic import (
+    convert_checker_scene_to_generic_scene, convert_to_generic_correspondences)
+from calib_board.utils.utils import (
+    convert_correspondences_array_to_checker_correspondences,
+    extract_frames_from_video)
+from calib_commons.data.data_pickle import save_to_pickle
 from calib_commons.data.load_calib import construct_cameras_intrinsics
-from calib_commons.data.data_pickle import save_to_pickle, load_from_pickle
 from calib_commons.eval_generic_scene import eval_generic_scene
 from calib_commons.scene import SceneType
+from calib_commons.utils.detect_board import BoardType, detect_board_corners
 from calib_commons.viz import visualization as generic_vizualization
-from calib_commons.utils.detect_board import detect_board_corners, BoardType
-
-from calib_board.core.checkerboardGeometry import CheckerboardGeometry
-from calib_board.core.checkerboard import CheckerboardMotion
-from calib_board.core.config import ExternalCalibratorConfig
-from calib_board.core.externalCalibrator import ExternalCalibrator, WorldFrame
-from calib_board.core.correspondences import filter_correspondences_with_track_length, filter_correspondences_with_non_nan_points
-from calib_board.utils.convert_to_generic import convert_checker_scene_to_generic_scene, convert_to_generic_correspondences
-from calib_board.utils.utils import convert_correspondences_array_to_checker_correspondences
-from calib_board.utils import visualization
-
-
 
 # random seed
 np.random.seed(1)
 
 ############################### USER INTERFACE ####################################
 
-# PATHS
-images_parent_folder = str(Path(r"C:\Users\timfl\Documents\test_boardCal\charuco_images"))
-intrinsics_folder = str(Path(r"C:\Users\timfl\Documents\Master Thesis\Final_XP\intrinsics_calibration\output\gopro_240fps"))
+cfg = tyro.cli(Config)
+cfg.input_folder = Path(cfg.input_folder)
+cfg.intrinsics_folder = Path(cfg.intrinsics_folder)
+cfg.out_folder_calib = Path(cfg.out_folder_calib)
+cfg.external_calibrator_config.checkerboard_geometry = cfg.checkerboard_geometry
 
-# PRE-PROCESSING PARAMETERS
-checkerboard_geometry = CheckerboardGeometry(rows = 4, # internal rows
-                                            columns = 6, # internal columns
-                                            square_size = 0.165)  # [m]
-board_type = BoardType.CHARUCO
-if board_type == BoardType.CHARUCO:
-    charuco_marker_size = 0.123
-    charuco_dictionary = cv2.aruco.DICT_4X4_100
-show_detection_images = False
-save_detection_images = False
- 
-# CALIBRATION PARAMETERS
-external_calibrator_config = ExternalCalibratorConfig(
-    checkerboard_motion = CheckerboardMotion.FREE, # CheckerboardMotion.PLANAR or CheckerboardMotion.FREE
-    min_track_length = 2, # min number of camera per object (=3D) point
-    checkerboard_geometry = checkerboard_geometry,
-    reprojection_error_threshold = 1, # [pix]
-    min_number_of_valid_observed_points_per_checkerboard_view = 10,
-    ba_least_square_ftol = 1e-6, # Non linear Least-Squares 
-    least_squares_verbose = 0, # 0: silent, 1: report only final results, 2: report every iteration
-    camera_score_threshold = 200,
-    verbose = 1 # 0: only final report, 1: only camera name when added, 2: full verbose
-)
-out_folder_calib = Path("results")
-show_viz = 1
-save_viz = 1
-save_eval_metrics_to_json = 1
+###################### PRE-PROCESSING: SAMPLING FRAMES FROM VIDEO ###########################
+files = [f for f in cfg.input_folder.iterdir() if f.is_file()]
+is_video = files[0].suffix.lower() in [".mp4", ".avi", ".mov"] if len(files) > 0 else False
 
 
+if is_video:
+    # Sample frames from all videos and store into temporary folder
+    sampled_images_folder = cfg.input_folder / "sampled_images"
+    sampled_images_folder.mkdir(parents=True, exist_ok=True)
+
+    for video_file in cfg.input_folder.iterdir():
+        if not video_file.is_file() or video_file.suffix.lower() not in [".mp4", ".avi", ".mov"]:
+            continue
+        subfolder = sampled_images_folder / video_file.stem
+        extract_frames_from_video(str(video_file), str(subfolder), cfg.sampling_step, cfg.start_time_window, cfg.end_time_window)
+
+    cfg.input_folder = sampled_images_folder
 ###################### PRE-PROCESSING: CORNERS DETECTION ###########################
 
-if board_type == BoardType.CHARUCO:
-    charuco_detector = cv2.aruco.CharucoDetector(cv2.aruco.CharucoBoard((checkerboard_geometry.columns+1, checkerboard_geometry.rows+1), 
-                                                                        checkerboard_geometry.square_size, 
-                                                                        charuco_marker_size, 
-                                                                        cv2.aruco.getPredefinedDictionary(charuco_dictionary)))
+if cfg.board_type == BoardType.CHARUCO:
+    charuco_detector = cv2.aruco.CharucoDetector(cv2.aruco.CharucoBoard((cfg.checkerboard_geometry.columns+1, cfg.checkerboard_geometry.rows+1), 
+                                                                        cfg.checkerboard_geometry.square_size, 
+                                                                        cfg.charuco_marker_size, 
+                                                                        cv2.aruco.getPredefinedDictionary(cfg.charuco_dictionary)))
 else: 
     charuco_detector = None
 
-correspondences_nparray = detect_board_corners(images_parent_folder=images_parent_folder,
-                                        board_type=board_type,
+correspondences_nparray = detect_board_corners(images_parent_folder=cfg.input_folder,
+                                        board_type=cfg.board_type,
                                         charuco_detector=charuco_detector,
-                                        columns=checkerboard_geometry.columns, 
-                                        rows=checkerboard_geometry.rows, 
-                                        intrinsics_folder=intrinsics_folder, 
+                                        columns=cfg.checkerboard_geometry.columns, 
+                                        rows=cfg.checkerboard_geometry.rows, 
+                                        intrinsics_folder=cfg.intrinsics_folder, 
                                         undistort=True, 
-                                        display=show_detection_images, 
-                                        save_images_with_overlayed_detected_corners=save_detection_images)
+                                        display=cfg.show_detection_images, 
+                                        save_images_with_overlayed_detected_corners=cfg.save_detection_images)
 correspondences = convert_correspondences_array_to_checker_correspondences(correspondences_nparray)
 
     # # save_to_pickle(out_folder_calib / "correspondences_detected.pkl", correspondences)
@@ -87,17 +78,17 @@ correspondences = convert_correspondences_array_to_checker_correspondences(corre
 ###################### EXTERNAL CALIBRATION ###########################
 
 # keep only chessboard views with sufficient corners detected
-correspondences = filter_correspondences_with_non_nan_points(correspondences, external_calibrator_config.min_number_of_valid_observed_points_per_checkerboard_view)
+correspondences = filter_correspondences_with_non_nan_points(correspondences, cfg.external_calibrator_config.min_number_of_valid_observed_points_per_checkerboard_view)
 # keep only chessboard with sufficient track length
-correspondences = filter_correspondences_with_track_length(correspondences, external_calibrator_config.min_track_length)
+correspondences = filter_correspondences_with_track_length(correspondences, cfg.external_calibrator_config.min_track_length)
 
-out_folder_calib.mkdir(parents=True, exist_ok=True)
-intrinsics = construct_cameras_intrinsics(images_parent_folder, intrinsics_folder)
+cfg.out_folder_calib.mkdir(parents=True, exist_ok=True)
+intrinsics = construct_cameras_intrinsics(cfg.input_folder, cfg.intrinsics_folder)
 
 # Calibrate
 externalCalibrator = ExternalCalibrator(correspondences=correspondences, 
                                         intrinsics=intrinsics, 
-                                        config=external_calibrator_config
+                                        config=cfg.external_calibrator_config
                                         )
 externalCalibrator.calibrate()
 checkerboard_scene_estimate = externalCalibrator.get_scene(world_frame=WorldFrame.CAM_FIRST_CHOOSEN)
@@ -107,36 +98,39 @@ generic_scene = convert_checker_scene_to_generic_scene(checkerboard_scene_estima
 generic_obsv = convert_to_generic_correspondences(checkerboard_correspondences)
 
 # Save files
-generic_scene.save_cameras_poses_to_json(out_folder_calib / "camera_poses.json")
-print("camera poses saved to", out_folder_calib / "camera_poses.json")
-scene_estimate_file = out_folder_calib / "scene_estimate.pkl"
+generic_scene.save_cameras_poses_to_json(cfg.out_folder_calib / "camera_poses.json")
+print("camera poses saved to", cfg.out_folder_calib / "camera_poses.json")
+scene_estimate_file = cfg.out_folder_calib / "scene_estimate.pkl"
 save_to_pickle(scene_estimate_file, generic_scene)
 print("scene estimate saved to", scene_estimate_file)
-correspondences_file = out_folder_calib / "correspondences.pkl"
+correspondences_file = cfg.out_folder_calib / "correspondences.pkl"
 save_to_pickle(correspondences_file, generic_obsv)
 print("correspondences saved to", correspondences_file)
-metrics = eval_generic_scene(generic_scene, generic_obsv, camera_groups=None, save_to_json=save_eval_metrics_to_json, output_path=out_folder_calib / "metrics.json", print_ = True)
+metrics = eval_generic_scene(generic_scene, generic_obsv, camera_groups=None, save_to_json=cfg.save_eval_metrics_to_json, output_path=cfg.out_folder_calib / "metrics.json", print_ = True)
 print("")
 
+if cfg.save_colmap_reconstruction:
+    generic_scene.save_colmap(cfg.out_folder_calib / "colmap")
+
 # Visualization
-if show_viz or save_viz:
+if cfg.show_viz or cfg.save_viz:
     dpi = 300
-    save_path = out_folder_calib / "scene.png"
-    visualization.visualize_scenes([checkerboard_scene_estimate], show_ids=False, show_fig=show_viz, save_fig=save_viz, save_path=save_path)
-    if save_viz:
+    save_path = cfg.out_folder_calib / "scene.png"
+    visualization.visualize_scenes([checkerboard_scene_estimate], show_ids=False, show_fig=cfg.show_viz, save_fig=cfg.save_viz, save_path=save_path)
+    if cfg.save_viz:
         print("scene visualization saved to", save_path)
-    save_path = out_folder_calib / "2d.png"
-    visualization.visualize_2d(checkerboard_scene_estimate, checkerboard_correspondences, which="both", subplots=True, show_ids=False, show_fig=show_viz, save_fig=save_viz, save_path=save_path)
-    if save_viz:
+    save_path = cfg.out_folder_calib / "2d.png"
+    visualization.visualize_2d(checkerboard_scene_estimate, checkerboard_correspondences, which="both", subplots=True, show_ids=False, show_fig=cfg.show_viz, save_fig=cfg.save_viz, save_path=save_path)
+    if cfg.save_viz:
         print("2d visualization saved to", save_path)
-    save_path = out_folder_calib / "2d_errors.png"
+    save_path = cfg.out_folder_calib / "2d_errors.png"
     generic_vizualization.plot_reprojection_errors(scene_estimate=generic_scene, 
                                         observations=generic_obsv, 
-                                        show_fig=show_viz,
-                                        save_fig=save_viz, 
+                                        show_fig=cfg.show_viz,
+                                        save_fig=cfg.save_viz, 
                                         save_path=save_path)
-    if save_viz:
+    if cfg.save_viz:
         print("2d errors visualization saved to", save_path)
 
-    if show_viz:
+    if cfg.show_viz:
         plt.show()

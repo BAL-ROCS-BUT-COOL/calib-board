@@ -1,6 +1,8 @@
-import json 
+import os
+import subprocess 
+
 import numpy as np
-import copy
+
 
 from calib_board.core.observationCheckerboard import ObservationCheckerboard
 
@@ -50,3 +52,31 @@ def convert_correspondences_array_to_checker_correspondences(correspondences):
         for checker_id, _2d in correspondences[cam].items():
                 correspondences_checker[cam][checker_id] = ObservationCheckerboard(_2d)
     return correspondences_checker
+
+
+def extract_frames_from_video(video_path: str, output_dir: str, sampling_step: int, start_time: str = None, end_time: str = None):
+    trim_txt = " "
+    if start_time is not None:
+        trim_txt += f"-ss {start_time} "
+    if end_time is not None:
+        trim_txt += f"-to {end_time} "
+
+    # Check if CUDA acceleration is available
+     # Check if nvenc is available for speed up
+    nvenc_available = False
+    try:
+        cmd = "ffmpeg -hide_banner -hwaccels | grep cuda"
+        encoders = subprocess.check_output(cmd, shell=True).decode("utf-8")
+        if "cuda" not in encoders:
+            raise subprocess.CalledProcessError(1, cmd)
+        else:
+            nvenc_available = True
+    except subprocess.CalledProcessError:
+        print("WARNING: cuda hwaccel not available, frame extraction will be slow. Install NVIDIA drivers and ffmpeg with cuda support for better speeds.")
+
+    hwaccel = " -hwaccel cuda" if nvenc_available else ""
+    # nvenc = " -c:v h264_nvenc" if nvenc_available else ""
+
+    ffmpeg_cmd = f"ffmpeg{hwaccel}{trim_txt}-i {video_path} -vf \"select=not(mod(n\,{sampling_step}))\" -vsync vfr {output_dir}/%04d.jpg"
+    os.makedirs(output_dir, exist_ok=True)
+    subprocess.run(ffmpeg_cmd, shell=True)
