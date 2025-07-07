@@ -14,6 +14,7 @@ def cost_function_ba(
     intrinsics_array: NDArray[np.float64],
     observations: NDArray[np.float64],
     mask: NDArray[np.bool_],
+    free_first: bool
 ) -> NDArray[np.float64]:
     """
     Calculates the reprojection error vector for bundle adjustment.
@@ -46,6 +47,7 @@ def cost_function_ba(
         motion=motion,
         _3dA=_3dA,
         intrinsics=intrinsics_array,
+        free_first=free_first
     )
 
     # Flatten the reprojection results and apply the mask to get the valid estimates.
@@ -107,7 +109,6 @@ def compute_poses_from_6dof_vectorized(x: NDArray[np.float64]) -> NDArray[np.flo
         np.zeros_like(X),  cosX, -sinX,
         np.zeros_like(X),  sinX,  cosX
     ], axis=1).reshape(num_poses, 3, 3)
-    # fmt: on
 
     # Combine rotation matrices: R = Rz @ Ry @ Rx.
     # The @ operator handles batched matrix multiplication.
@@ -150,13 +151,11 @@ def compute_poses_from_3dof_vectorized(x: NDArray[np.float64]) -> NDArray[np.flo
     sin_theta_z = np.sin(theta_z)
 
     # Create rotation matrices (Rz) in a vectorized manner.
-    # fmt: off
     Rz = np.stack([
         cos_theta_z, -sin_theta_z, np.zeros_like(theta_z),
         sin_theta_z,  cos_theta_z, np.zeros_like(theta_z),
         np.zeros_like(theta_z), np.zeros_like(theta_z), np.ones_like(theta_z)
     ], axis=1).reshape(num_poses, 3, 3)
-    # fmt: on
 
     # Assemble the 4x4 homogeneous transformation matrices.
     poses = np.zeros((num_poses, 4, 4))
@@ -172,21 +171,34 @@ def extract_all_poses_from_x(
     num_cameras: int,
     num_checkers: int,
     motion: CheckerboardMotion,
+    free_first: bool
 ) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """
     Extracts camera and checkerboard poses from the optimization vector 'x'.
 
-    The vector 'x' is structured as follows:
-    1. Parameters for (num_cameras - 1) cameras (6 DoF each).
-    2. Parameters for the first checkerboard (6 DoF).
+    The structure of the vector 'x' depends on the `free_first` flag.
+
+    If `free_first` is `True`, 'x' is structured as:
+    1. Parameters for (num_cameras - 1) cameras (6 DoF each). The first
+       camera is assumed to be at the identity pose.
+    2. Parameters for the first checkerboard (6 DoF absolute pose).
     3. Parameters for (num_checkers - 1) relative checkerboard poses
        (6 or 3 DoF depending on the motion model).
+
+    If `free_first` is `False`, 'x' is structured as:
+    1. Parameters for all `num_cameras` cameras (6 DoF each).
+    2. Parameters for the first checkerboard (6 DoF absolute pose).
+    3. Parameters for (num_checkers - 1) relative checkerboard poses.
 
     Args:
         x: The 1D optimization vector.
         num_cameras: The total number of cameras.
         num_checkers: The total number of checkerboards.
         motion: The motion type of the checkerboards.
+        free_first: If `True`, the first camera's pose is considered fixed at
+                   the world origin (identity matrix) and its parameters are
+                   omitted from `x`. If `False`, all camera poses are
+                   treated as variables and are included in `x`.
 
     Returns:
         A tuple containing:
@@ -198,9 +210,14 @@ def extract_all_poses_from_x(
     camera_poses[:, :, 0] = np.eye(4)  # First camera is fixed at the origin
     
     # Other cameras are optimized (num_cameras - 1 of them)
-    cam_params_end_idx = (num_cameras - 1) * 6
+    cam_params_end_idx = num_cameras * 6 if free_first else (num_cameras - 1) * 6
+
     other_camera_poses = compute_poses_from_6dof_vectorized(x[:cam_params_end_idx])
-    camera_poses[:, :, 1:] = other_camera_poses
+
+    if free_first:
+        camera_poses = other_camera_poses
+    else:
+        camera_poses[:, :, 1:] = other_camera_poses
 
     # --- Extract Checkerboard Poses ---
     checker_poses = np.zeros((4, 4, num_checkers))
@@ -227,8 +244,6 @@ def extract_all_poses_from_x(
     else:
         raise ValueError(f"Unknown motion type {motion}.")
 
-    # This assignment will fail if the number of poses in other_checker_poses
-    # does not match (num_checkers - 1), preserving the original code's behavior.
     if num_checkers > 1:
         checker_poses[:, :, 1:] = other_checker_poses
 
@@ -241,6 +256,7 @@ def compute_reprojection(
     motion: CheckerboardMotion,
     _3dA: NDArray[np.float64],
     intrinsics: NDArray[np.float64],
+    free_first: bool
 ) -> NDArray[np.float64]:
     """
     Computes the reprojection of 3D points onto 2D image planes for all
@@ -262,7 +278,7 @@ def compute_reprojection(
     """
     # 1. Reconstruct all camera and checkerboard poses from the parameter vector.
     camera_poses, checker_poses = extract_all_poses_from_x(
-        x, num_cameras, num_checkers, motion
+        x, num_cameras, num_checkers, motion, free_first=free_first
     )
 
     # 2. Transform checkerboard corner points to the world frame.
@@ -309,6 +325,7 @@ def compute_jacobian_sparsity_pattern(
     checker_ids: NDArray[np.int_],
     n_cameras: int,
     n_checkers: int,
+    free_first: bool
 ) -> scipy.sparse.csr_matrix:
     """
     Constructs the sparsity pattern of the Jacobian matrix for bundle adjustment.
@@ -324,12 +341,13 @@ def compute_jacobian_sparsity_pattern(
         checker_ids: Array of checkerboard indices for each observation.
         n_cameras: Total number of cameras.
         n_checkers: Total number of checkerboards.
+        free_first: Whether to fix the position of the first camera
 
     Returns:
         The Jacobian sparsity pattern as a SciPy CSR matrix.
     """
     PARAMS_PER_POSE = 6
-    n_camera_params = (n_cameras - 1) * PARAMS_PER_POSE
+    n_camera_params = n_cameras * PARAMS_PER_POSE if free_first else (n_cameras - 1) * PARAMS_PER_POSE
     n_checker_params = n_checkers * PARAMS_PER_POSE
     n_params = n_camera_params + n_checker_params
 
@@ -340,7 +358,7 @@ def compute_jacobian_sparsity_pattern(
         chk_idx = checker_ids[obs_idx]
 
         # Dependency on the camera pose (if not the fixed first camera).
-        if cam_idx > 0:
+        if not free_first and cam_idx > 0:
             cam_param_start = (cam_idx - 1) * PARAMS_PER_POSE
             row_indices.extend([obs_idx] * PARAMS_PER_POSE)
             col_indices.extend(range(cam_param_start, cam_param_start + PARAMS_PER_POSE))

@@ -63,6 +63,7 @@ class ExternalCalibrator:
 
         # --- Solving Parameters ---
         self.config = config
+        self.free_first = False
 
         # --- Calibration State ---
         # The current estimate of all camera and checkerboard poses.
@@ -72,6 +73,7 @@ class ExternalCalibrator:
         # A set of camera IDs that have not yet been added to the estimate.
         self.remaining_cameras: set[idtype] = set(self.correspondences.keys())
         
+
     def get_camera_score(self, cam_id: idtype) -> float:
         """
         Calculates a score for a camera based on the spatial distribution of
@@ -106,6 +108,7 @@ class ExternalCalibrator:
 
         return score
 
+
     def get_cameras_scores(self) -> dict[idtype, float]:
         """
         Calculates the distribution score for every camera currently in the scene estimate.
@@ -118,6 +121,7 @@ class ExternalCalibrator:
             for cam_id in self.estimate.cameras.keys()
         }
     
+
     def calibrate(self) -> tuple[bool, dict[idtype, float]]:
         """
         Executes the main incremental calibration pipeline.
@@ -147,6 +151,11 @@ class ExternalCalibrator:
             self.add_checkers(cam_id)
             self.iterative_filtering()
 
+        if self.config.free_first:
+            self.free_first = True
+            print("Running BA with FREE first cam")
+            self.iterative_filtering()
+
         # 3. Finalization and Reporting.
         print("\n##################### CALIBRATION TERMINATED #####################")
         print(f"Chessboards removed: {self.checkers_removed}")
@@ -161,6 +170,7 @@ class ExternalCalibrator:
         else:
             print("Calibration Status: FAILURE: some cameras do not have a sufficient distribution score.")
             return False, scores
+
 
     def get_scene(self, world_frame: WorldFrame) -> SceneCheckerboard:
         """
@@ -194,6 +204,7 @@ class ExternalCalibrator:
             cameras=cameras, checkers=checkers, scene_type=SceneType.ESTIMATE
         )
 
+
     def pnp(self, _2d: NDArray, _3d: NDArray, K: NDArray) -> NDArray:
         """
         Solves the Perspective-n-Point (PnP) problem to find the pose of a
@@ -217,6 +228,7 @@ class ExternalCalibrator:
         # We need the camera pose in the world frame, which is the inverse.
         T_W_C = se3.inv_T(T_C_W)
         return T_W_C
+
 
     def select_initial_camera(self) -> idtype:
         """
@@ -265,6 +277,7 @@ class ExternalCalibrator:
 
         return best_cam_id
     
+
     def select_next_best_cam(self) -> idtype:
         """
         Selects the next best camera to add to the scene from the pool of
@@ -285,6 +298,7 @@ class ExternalCalibrator:
 
         return best_cam_id
     
+
     def view_score(self, image_points: NDArray, image_resolution: tuple[int, int]) -> float:
         """
         Computes a score based on the spatial distribution of points in an image.
@@ -323,6 +337,7 @@ class ExternalCalibrator:
                     s += w_l
         return s
     
+
     def add_camera(self, cam_id: idtype) -> None:
         """
         Estimates the pose of a new camera and adds it to the scene.
@@ -430,6 +445,7 @@ class ExternalCalibrator:
                 print(f"had {len(valid_common_checkers_id)} views of checkers in common")
                 print(f"initial pose refined on {best_num_inliers} checkers")
            
+
     def add_checkers(self, camera_id: idtype) -> None:
         """
         Identifies and adds new checkerboards to the scene that are visible
@@ -488,7 +504,6 @@ class ExternalCalibrator:
             continue_filtering = self.filtering()
            
   
-
     def filtering(self) -> bool:
         """
         Filters out observations with high reprojection errors and removes
@@ -590,7 +605,14 @@ class ExternalCalibrator:
         checker_ids_obs = np.broadcast_to(chk_indices, observations_arr.shape).ravel()[valid_mask]
 
         # 3. Compute the Jacobian sparsity pattern to speed up optimization.
-        A = ba.compute_jacobian_sparsity_pattern(len(observations), cameras_ids_obs, checker_ids_obs, num_cameras, num_checkerboards)
+        A = ba.compute_jacobian_sparsity_pattern(
+            len(observations), 
+            cameras_ids_obs, 
+            checker_ids_obs, 
+            num_cameras, 
+            num_checkerboards,
+            self.free_first
+        )
 
         # 4. Run the optimization.
         results = least_squares(
@@ -609,6 +631,7 @@ class ExternalCalibrator:
                 intrinsics_array,
                 observations,
                 valid_mask,
+                self.free_first
             ),
         )
                
@@ -623,8 +646,7 @@ class ExternalCalibrator:
             num_checkers=num_checkerboards,
         )
         
-    
-         
+        
     def update_estimate_from_parametrization(
         self, x: NDArray, num_cameras: int, num_checkers: int
     ) -> SceneCheckerboard:
@@ -641,7 +663,7 @@ class ExternalCalibrator:
             An updated SceneCheckerboard object.
         """
         camera_poses, checker_poses = ba.extract_all_poses_from_x(
-            x, num_cameras, num_checkers, self.config.checkerboard_motion
+            x, num_cameras, num_checkers, self.config.checkerboard_motion, self.free_first
         )
         
         estimate = copy.deepcopy(self.estimate)
@@ -652,6 +674,7 @@ class ExternalCalibrator:
             estimate.checkers[checker_id].pose = SE3(checker_poses[:, :, k])
 
         return estimate
+
 
     def parametrization_from_estimate(
         self, estimate: SceneCheckerboard, checkerboard_motion: CheckerboardMotion
@@ -677,7 +700,11 @@ class ExternalCalibrator:
         
         # Add parameters for cameras (skip the first, which is the fixed origin).
         camera_ids = list(estimate.cameras.keys())
-        for cam_id in camera_ids[1:]:
+
+        if not self.free_first:
+            camera_ids = camera_ids[1:]
+
+        for cam_id in camera_ids:
             params.append(se3.q_from_T(estimate.cameras[cam_id].pose.mat))
         
         # Add parameters for checkerboards.

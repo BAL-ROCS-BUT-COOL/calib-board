@@ -34,6 +34,7 @@ class ExternalCalibratorConfig:
                               least-squares optimizer.
         least_squares_verbose: Verbosity level for the least-squares solver.
                                0=silent, 1=final report, 2=report each iteration.
+        fix_first: Whether to fix the position of the first camera
         verbose: General verbosity level for the calibrator.
     """
 
@@ -45,6 +46,7 @@ class ExternalCalibratorConfig:
     camera_score_threshold: float = 200.0
     ba_least_square_ftol: float = 1e-6
     least_squares_verbose: int = 1
+    free_first: bool = False
     verbose: int = 1
 
 
@@ -112,9 +114,10 @@ class Config:
             reprojection_error_threshold=1.0,
             min_number_of_valid_observed_points_per_checkerboard_view=10,
             ba_least_square_ftol=1e-6,
-            least_squares_verbose=0,
+            least_squares_verbose=2,
             camera_score_threshold=200.0,
-            verbose=1,
+            free_first=True,
+            verbose=2,
         )
     )
 
