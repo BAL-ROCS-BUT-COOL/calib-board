@@ -122,7 +122,7 @@ class Config:
     )
 
     # --- DEBUG AND VISUALIZATION PARAMETERS ---
-    show_viz: bool = True
+    show_viz: bool = False
     save_viz: bool = True
     save_eval_metrics_to_json: bool = True
     save_colmap_reconstruction: bool = False
