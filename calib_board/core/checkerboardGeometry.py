@@ -127,8 +127,8 @@ class CheckerboardGeometry:
         """
         # Note: This calculates the center of the bounding box of the corners
         # in the board's local frame.
-        center_x = ((self.columns - 1) * self.square_size) / 2
-        center_y = ((self.rows - 1) * self.square_size) / 2
+        center_x = (self.columns * self.square_size) / 2
+        center_y = (self.rows * self.square_size) / 2
         return np.array([center_x, center_y])
 
     def get_num_corners(self) -> int:
