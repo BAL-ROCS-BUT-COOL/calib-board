@@ -8,9 +8,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import tyro
 
-# Configure logging for better feedback
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
 # Assuming these are third-party or project-specific libraries
 from calib_board.core.config import Config
 from calib_board.core.correspondences import (
@@ -33,6 +30,12 @@ from calib_commons.eval_generic_scene import eval_generic_scene
 from calib_commons.scene import Scene, SceneType
 from calib_commons.utils.detect_board import BoardType, detect_board_corners
 from calib_commons.viz import visualization as generic_vizualization
+
+# Configure logging for better feedback
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 def prepare_image_folder(cfg: Config) -> Path:
@@ -58,7 +61,8 @@ def prepare_image_folder(cfg: Config) -> Path:
 
     if cfg.force_rerun and sampled_images_folder.exists():
         logging.info(
-            f"'force_rerun' is True. Deleting existing folder: {sampled_images_folder}"
+            f"'force_rerun' is True. Deleting existing folder: \
+                {sampled_images_folder}"
         )
         shutil.rmtree(sampled_images_folder)
 
@@ -68,20 +72,30 @@ def prepare_image_folder(cfg: Config) -> Path:
 
     logging.info("Input is video. Sampling frames...")
     sampled_images_folder.mkdir(parents=True, exist_ok=True)
-    video_files = [f for f in input_path.iterdir() if f.is_file() and f.suffix.lower() in [".mp4", ".avi", ".mov"]]
+    video_files = [
+        f for f in input_path.iterdir()
+        if f.is_file()
+        and f.suffix.lower() in [".mp4", ".avi", ".mov"]
+    ]
 
     for video_file in video_files:
         logging.info(f"Extracting frames from {video_file.name}...")
         subfolder = sampled_images_folder / video_file.stem
         extract_frames_from_video(
-            str(video_file), str(subfolder), cfg.sampling_step, cfg.start_time_window, cfg.end_time_window
+            str(video_file),
+            str(subfolder),
+            cfg.sampling_step,
+            cfg.start_time_window,
+            cfg.end_time_window
         )
 
     logging.info(f"Frames saved to: {sampled_images_folder}")
     return sampled_images_folder
 
 
-def detect_or_load_correspondences(cfg: Config, image_folder: Path) -> Dict[str, Any]:
+def detect_or_load_correspondences(
+    cfg: Config, image_folder: Path
+) -> Dict[str, Any]:
     """
     Detects board corners or loads them from a cached file if available.
 
@@ -102,7 +116,8 @@ def detect_or_load_correspondences(cfg: Config, image_folder: Path) -> Dict[str,
     charuco_detector = None
     if cfg.board_type == BoardType.CHARUCO:
         board = cv2.aruco.CharucoBoard(
-            (cfg.checkerboard_geometry.columns + 1, cfg.checkerboard_geometry.rows + 1),
+            (cfg.checkerboard_geometry.columns + 1,
+             cfg.checkerboard_geometry.rows + 1),
             cfg.checkerboard_geometry.square_size,
             cfg.charuco_marker_size,
             cv2.aruco.getPredefinedDictionary(cfg.charuco_dictionary),
@@ -115,12 +130,14 @@ def detect_or_load_correspondences(cfg: Config, image_folder: Path) -> Dict[str,
         charuco_detector=charuco_detector,
         columns=cfg.checkerboard_geometry.columns,
         rows=cfg.checkerboard_geometry.rows,
-        intrinsics_folder=Path(cfg.intrinsics_folder),
+        intrinsics_path=Path(cfg.intrinsics_path),
         undistort=True,
         display=cfg.show_detection_images,
         save_images_with_overlayed_detected_corners=cfg.save_detection_images,
     )
-    correspondences = convert_correspondences_array_to_checker_correspondences(correspondences_nparray)
+    correspondences = convert_correspondences_array_to_checker_correspondences(
+        correspondences_nparray
+    )
 
     logging.info(f"Saving detected correspondences to {cache_file}")
     save_to_pickle(cache_file, correspondences)
@@ -140,11 +157,13 @@ def run_calibration(
         cfg: The main configuration object.
 
     Returns:
-        A tuple containing the estimated scene and the filtered correspondences.
+        A tuple containing the estimated scene and the filtered
+        correspondences.
     """
     logging.info("Filtering correspondences...")
     filtered_corr = filter_correspondences_with_non_nan_points(
-        correspondences, cfg.external_calibrator_config.min_number_of_valid_observed_points_per_checkerboard_view
+        correspondences,
+        cfg.external_calibrator_config.min_number_of_valid_observed_points_per_checkerboard_view
     )
     filtered_corr = filter_correspondences_with_track_length(
         filtered_corr, cfg.external_calibrator_config.min_track_length
@@ -159,7 +178,9 @@ def run_calibration(
     external_calibrator.calibrate()
 
     logging.info("Calibration finished. Retrieving scene...")
-    checkerboard_scene_estimate = external_calibrator.get_scene(world_frame=WorldFrame.CAM_FIRST_CHOOSEN)
+    checkerboard_scene_estimate = external_calibrator.get_scene(
+        world_frame=WorldFrame.CAM_FIRST_CHOOSEN
+    )
     checkerboard_correspondences = external_calibrator.correspondences
 
     checkerboard_scene_estimate.print_cameras_poses()
@@ -167,7 +188,9 @@ def run_calibration(
 
 
 def process_and_save_results(
-    checkerboard_scene_estimate: Scene, checkerboard_correspondences: Dict[str, Any], cfg: Config
+    checkerboard_scene_estimate: Scene,
+    checkerboard_correspondences: Dict[str, Any],
+    cfg: Config
 ) -> tuple[Scene, Dict[str, Any]]:
     """
     Converts results to a generic format, saves them, and evaluates the scene.
@@ -182,8 +205,13 @@ def process_and_save_results(
     """
     out_dir = Path(cfg.out_folder_calib)
     logging.info("Converting results to generic scene format.")
-    generic_scene = convert_checker_scene_to_generic_scene(checkerboard_scene_estimate, scene_type=SceneType.ESTIMATE)
-    generic_obsv = convert_to_generic_correspondences(checkerboard_correspondences)
+    generic_scene = convert_checker_scene_to_generic_scene(
+        checkerboard_scene_estimate,
+        scene_type=SceneType.ESTIMATE
+    )
+    generic_obsv = convert_to_generic_correspondences(
+        checkerboard_correspondences
+    )
 
     # Save files
     cam_poses_file = out_dir / "camera_poses.json"
@@ -214,7 +242,7 @@ def process_and_save_results(
         colmap_path = out_dir / "colmap"
         logging.info(f"Saving COLMAP reconstruction to: {colmap_path}")
         generic_scene.save_colmap(colmap_path)
-    
+
     return generic_scene, generic_obsv
 
 
@@ -244,7 +272,11 @@ def generate_visualizations(
     # 3D Scene Visualization
     save_path = out_dir / "scene_3d.png"
     visualization.visualize_scenes(
-        [checkerboard_scene], show_ids=False, show_fig=cfg.show_viz, save_fig=cfg.save_viz, save_path=save_path
+        [checkerboard_scene],
+        show_ids=False,
+        show_fig=cfg.show_viz,
+        save_fig=cfg.save_viz,
+        save_path=save_path
     )
     if cfg.save_viz:
         logging.info(f"3D scene visualization saved to {save_path}")
@@ -252,11 +284,17 @@ def generate_visualizations(
     # 2D Detections Visualization
     save_path = out_dir / "detections_2d.png"
     visualization.visualize_2d(
-        checkerboard_scene, checkerboard_corr, which="both", show_ids=False, show_fig=cfg.show_viz, save_fig=cfg.save_viz, save_path=save_path
+        checkerboard_scene,
+        checkerboard_corr,
+        which="both",
+        show_ids=False,
+        show_fig=cfg.show_viz,
+        save_fig=cfg.save_viz,
+        save_path=save_path
     )
     if cfg.save_viz:
         logging.info(f"2D detections visualization saved to {save_path}")
-    
+
     # 2D Reprojection Errors Visualization
     save_path = out_dir / "reprojection_errors_2d.png"
     generic_vizualization.plot_reprojection_errors(
@@ -267,7 +305,7 @@ def generate_visualizations(
         save_path=save_path,
     )
     if cfg.save_viz:
-        logging.info(f"2D reprojection error visualization saved to {save_path}")
+        logging.info(f"2D reprojection error vis saved to {save_path}")
 
     if cfg.show_viz:
         logging.info("Displaying visualization windows...")
@@ -290,18 +328,35 @@ def main(cfg: Config):
     correspondences = detect_or_load_correspondences(cfg, image_folder)
 
     # --- 3. External Calibration ---
-    intrinsics = construct_cameras_intrinsics(image_folder, Path(cfg.intrinsics_folder))
-    
+    intrinsics = construct_cameras_intrinsics(
+        image_folder,
+        Path(cfg.intrinsics_path)
+    )
+
     # Update config with correct checkerboard geometry for the calibrator
     cfg.external_calibrator_config.checkerboard_geometry = cfg.checkerboard_geometry
-    
-    checkerboard_scene, checkerboard_corr = run_calibration(correspondences, intrinsics, cfg)
+
+    checkerboard_scene, checkerboard_corr = run_calibration(
+        correspondences,
+        intrinsics,
+        cfg
+    )
 
     # --- 4. Save Results and Evaluate ---
-    generic_scene, generic_obsv = process_and_save_results(checkerboard_scene, checkerboard_corr, cfg)
-    
+    generic_scene, generic_obsv = process_and_save_results(
+        checkerboard_scene,
+        checkerboard_corr,
+        cfg
+    )
+
     # --- 5. Visualization ---
-    generate_visualizations(checkerboard_scene, checkerboard_corr, generic_scene, generic_obsv, cfg)
+    generate_visualizations(
+        checkerboard_scene, 
+        checkerboard_corr, 
+        generic_scene, 
+        generic_obsv, 
+        cfg
+    )
 
     logging.info("Calibration pipeline finished successfully.")
 
@@ -310,7 +365,7 @@ if __name__ == "__main__":
     # --- Configuration ---
     # Set a fixed random seed for reproducibility
     np.random.seed(1)
-    
+
     # Parse command-line arguments using tyro
     cfg = tyro.cli(Config)
 

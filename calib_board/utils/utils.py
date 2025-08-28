@@ -1,7 +1,7 @@
 """
-This module provides various utility functions related to checkerboard calibration,
-including geometric visibility checks, data structure conversions, and video
-frame extraction.
+This module provides various utility functions related to checkerboard
+calibration, including geometric visibility checks, data structure
+conversions, and video frame extraction.
 """
 import os
 import subprocess
@@ -10,7 +10,7 @@ from typing import Optional
 import numpy as np
 
 # Local application/library specific imports
-from calib_board.core.correspondences import Correspondences as CheckerCorrespondences
+from calib_board.core.correspondences import Correspondences
 from calib_board.core.observationCheckerboard import ObservationCheckerboard
 from calib_commons.types import idtype
 
@@ -29,7 +29,8 @@ def is_chessboard_visible(
         camera_pose: A 4x4 homogeneous transformation matrix representing the
                      camera's pose in the world frame (T_world_camera).
         chessboard_pose: A 4x4 homogeneous transformation matrix representing
-                         the chessboard's pose in the world frame (T_world_board).
+                         the chessboard's pose in the world frame
+                         (T_world_board).
 
     Returns:
         True if the chessboard is facing the camera, False otherwise.
@@ -41,7 +42,7 @@ def is_chessboard_visible(
     T_camera_board = T_camera_world @ chessboard_pose
     R_camera_board = T_camera_board[:3, :3]
 
-    # The normal vector of the chessboard in its own local frame (positive Z-axis).
+    # The normal vector of the chessboard in its own local frame (positive Z).
     board_normal_local = np.array([0.0, 0.0, 1.0])
 
     # The same normal vector transformed into the camera's coordinate system.
@@ -56,9 +57,10 @@ def is_chessboard_visible(
 
 def convert_correspondences_array_to_checker_correspondences(
     correspondences: dict[idtype, dict[idtype, np.ndarray]]
-) -> CheckerCorrespondences:
+) -> Correspondences:
     """
-    Converts a dictionary of 2D point arrays into ObservationCheckerboard objects.
+    Converts a dictionary of 2D point arrays into ObservationCheckerboard
+    objects.
 
     Args:
         correspondences: A nested dictionary mapping camera ID and then
@@ -94,7 +96,8 @@ def extract_frames_from_video(
         video_path: The path to the input video file.
         output_dir: The directory where the extracted frames will be saved.
         sampling_step: The frame sampling rate (e.g., 5 means every 5th frame).
-        start_time: The optional start time for extraction (format: "hh:mm:ss.ms").
+        start_time: The optional start time for extraction
+                    (format: "hh:mm:ss.ms").
         end_time: The optional end time for extraction (format: "hh:mm:ss.ms").
     """
     # Build time-trimming argument string
@@ -113,8 +116,10 @@ def extract_frames_from_video(
             hwaccel_available = True
     except (subprocess.CalledProcessError, FileNotFoundError):
         print(
-            "WARNING: cuda hwaccel not available, frame extraction will be slow. "
-            "Install NVIDIA drivers and ffmpeg with cuda support for better speeds."
+            "WARNING: cuda hwaccel not available, \
+                frame extraction will be slow. "
+            "Install NVIDIA drivers and ffmpeg with \
+                cuda support for better speeds."
         )
 
     hwaccel = " -hwaccel cuda" if hwaccel_available else ""

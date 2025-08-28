@@ -80,7 +80,7 @@ class Config:
 
     # --- INPUT/OUTPUT PARAMETERS ---
     input_folder: str
-    intrinsics_folder: str
+    intrinsics_path: str
     out_folder_calib: str = "results"
 
     # --- PRE-PROCESSING PARAMETERS ---
