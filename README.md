@@ -104,42 +104,42 @@ For more fine-grained control over the process, the follwing parameters are avai
 - `-h`: 
 
 **Required**
-- `--input-folder`: 
-- `--intrinsics-path`: 
+- `--input-folder`: Path to the folder containing time-synchronized images or videos.
+- `--intrinsics-path`: Path to the camera intrinsics parameter json files.
 
 **Input/Output Params**
-- `--out-folder-calib`: 
-- `--sampling-step`: 
-- `--start-time-window`: 
-- `--end-time-window`: 
-- `--force-rerun / --no-force-rerun`: 
+- `--out-folder-calib`: Name of the output folder for calibration results.
+- `--sampling-step`: (only when using video as input) Stride for sampling frames from videos.
+- `--start-time-window`: (only when using video as input) Start time for sampling (e.g., "00:00:00.000"). If None, starts from the beginning.
+- `--end-time-window`: (only when using video as input) End time for sampling. If None, samples until the end.
+- `--force-rerun / --no-force-rerun`: Delete all cached files/results and start fresh.
 
 **Pre-Processing Params**
-- `--board-type`: 
-- `--charuco-marker-size`: 
-- `--charuco-dictionary`: 
-- `--show-detection-images / --no-show-detection-images`: 
-- `--save-detection-images / --no-save-detection-images`: 
-- `--show-viz / --no-show-viz`: 
-- `--save-viz / --no-save-viz`: 
-- `--save-eval-metrics-to-json / --no-save-eval-metrics-to-json`: 
-- `--save-colmap-reconstruction / --no-save-colmap-reconstruction`: 
+- `--board-type`: The type of calibration board (e.g., CHARUCO or CHESSBOARD).
+- `--charuco-marker-size`: The size of the Aruco markers in a Charuco board [m].
+- `--charuco-dictionary`: The dictionary used for the ChArUco board (e.g. 4X4_100).
+- `--show-detection-images / --no-show-detection-images`: If True, display detection images during processing.
+- `--save-detection-images / --no-save-detection-images`: If True, save detection images to the output folder.
+- `--show-viz / --no-show-viz`: If True, display 3D visualizations of the results.
+- `--save-viz / --no-save-viz`: If True, save 3D visualizations to the output folder.
+- `--save-eval-metrics-to-json / --no-save-eval-metrics-to-json`: If True, save evaluation metrics to a JSON file.
+- `--save-colmap-reconstruction / --no-save-colmap-reconstruction`: If True, save the reconstruction in a COLMAP-compatible format.
 
 **Calibration Pattern Params**
-- `--checkerboard-geometry.rows` : 
-- `--checkerboard-geometry.columns` : 
-- `--checkerboard-geometry.square-size`:  
+- `--checkerboard-geometry.rows` : Number of internal corner rows (for Charuco and Chessboard!).
+- `--checkerboard-geometry.columns` : Number of internal corner columns (for Charuco and Chessboard!).
+- `--checkerboard-geometry.square-size`: The side length of a single square in meters (for Charuco and Chessboard!).
 
 **Calibration Params**
-- `--external-calibrator-config.checkerboard-motion`: 
-- `--external-calibrator-config.min-track-length`: 
-- `--external-calibrator-config.reprojection-error-threshold`: 
-- `--external-calibrator-config.min-number-of-valid-observed-points-per-checkerboard-view`: 
-- `--external-calibrator-config.camera-score-threshold`: 
-- `--external-calibrator-config.ba-least-square-ftol`: 
-- `--external-calibrator-config.least-squares-verbose`: 
-- `--external-calibrator-config.free-first, --external-calibrator-config.no-free-first`: 
-- `--external-calibrator-config.verbose`: 
+- `--external-calibrator-config.checkerboard-motion`: The motion model for the checkerboard (PLANAR or FREE).
+- `--external-calibrator-config.min-track-length`: The minimum number of camera views required for a 3D point to be considered valid.
+- `--external-calibrator-config.reprojection-error-threshold`: The maximum reprojection error (in pixels) for an observation to be considered an inlier. This parameter is quite important to set right. If the threshold is to low, too many points are filtered and the calibration becomes invalid.
+- `--external-calibrator-config.min-number-of-valid-observed-points-per-checkerboard-view`: The minimum number of detected corners required for a checkerboard view to be used. This can also be tuned; if set too high, a lot of otherwise usable detections are discarded. However an absolute minimum of 4 pionts is needed for PnP to succeed
+- `--external-calibrator-config.camera-score-threshold`: A threshold for a camera's score to be considered well-calibrated (only "cosmetic").
+- `--external-calibrator-config.ba-least-square-ftol`: The function tolerance for the bundle adjustment's least-squares optimizer.
+- `--external-calibrator-config.least-squares-verbose`: Verbosity level for the least-squares solver.
+- `--external-calibrator-config.free-first, --external-calibrator-config.no-free-first`: Whether to fix the first camera or not during the bundle adjustment. Not fixing it can improve the final result.
+- `--external-calibrator-config.verbose`: General verbosity level for the calibrator.
 
 > Note: when using `-h` there is one more class of parameters shown (`external-calibrator-config.checkerboard-geometry options`). However, these are automatically copied from the `calibration pattern params` anyways, so they do not have to be set specifically.
 
@@ -155,6 +155,7 @@ Additionally the following metrics are automatically generated and also stored i
 - `reprojection_errors_2d.png`: These are the detailed reprojection errors (for each point and camera) in an x-y scatterplot.
 
 > Note: A camera’s correspondences are the valid observations it makes of 3D points that are seen by at least one other camera. The collection of cameras that observe a given 3D point validly is called that point’s track. The number of such cameras is called "track length".
+
 
 <table width="100%">
   <thead>
