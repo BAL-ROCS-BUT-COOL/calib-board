@@ -5,14 +5,14 @@ A Python package for performing **external calibration** 📐 of multi-camera sy
 
 ## 📦 Contents
 
-- 🏗️ [Installation]()
-- 📖 [How to Use]()
-    - 📚 [Preparation]()
-    - ⚡ [Running the Calibration]()
-    - 📊 [Output]()
-    - 🚧 [Troubleshooting]()
-- 🎫 [License]()
-- 🤝 [Acknowledgments]()
+- 🏗️ [Installation](#%EF%B8%8F-installation)
+- 📖 [How to Use](#-how-to-use)
+    - 📚 [Preparation](#-preparation)
+    - ⚡ [Running the Calibration](#-running-the-calibration)
+    - 📊 [Output](#-output)
+    - 🚧 [Troubleshooting](#-troubleshooting)
+- 🎫 [License](#-license)
+- 🤝 [Acknowledgments](#-acknowledgements)
 
 
 ## 🏗️ Installation
