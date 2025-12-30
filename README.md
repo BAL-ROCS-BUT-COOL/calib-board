@@ -10,13 +10,12 @@ A Python package for performing **external calibration** 📐 of multi-camera sy
     - 📚 [Preparation](#-preparation)
     - ⚡ [Running the Calibration](#-running-the-calibration)
     - 📊 [Output](#-output)
-    - 🚧 [Troubleshooting](#-troubleshooting)
 - 🎫 [License](#-license)
 - 🤝 [Acknowledgments](#-acknowledgements)
 
 
 ## 🏗️ Installation
-Note: it is recommended to install this package through the external calibration meta-repository 👉`calibrate` to automatically get all the necessary dependencies! However, if this repository is installed standalone, the following steps are necessary:
+It is recommended to install this package through the external calibration meta-repository 👉`calibrate` to automatically get all the necessary dependencies! However, if this repository is installed standalone, the following steps are necessary:
 
 1. Install dependecies:
     This package depends on the custom utilities Python package 👉`calib-commons`. Information on how to install it can be found in it's readme.
@@ -30,7 +29,7 @@ Note: it is recommended to install this package through the external calibration
     ```bash
     pip install -e .
     ```
-    - Note: using the `-e` flag installs this package in editable mode (recommended). This means that changes made locally to the files are immediately reflected when importing the modules in other scripts.
+    > Note: using the `-e` flag installs this package in editable mode (recommended). This means that changes made locally to the files are immediately reflected when importing the modules in other scripts.
 
 4. Install additional dependencies (recommended):
     When using input videos for the board-calibration, `ffmpeg` is required. If not installed system wide anyways, the easiest way is to set up a conda environment for this package:
@@ -76,17 +75,19 @@ input_folder/
 │   ├── 1.jpg
 │   ├── 2.jpg
 │   └── ...
-└── <camera_name_2>/
-    ├── 1.jpg
-    ├── 2.jpg
-    └── ...
+├── <camera_name_2>/
+│   ├── 1.jpg
+│   ├── 2.jpg
+│   └── ...
+└── ...
 ```
 
 when using videos:
 ```plaintext
 input_folder/
 ├── <camera_name_1>.mp4
-└── <camera_name_1>.mp4
+├── <camera_name_2>.mp4
+└── ...
 ```
 > Note: to avoid hard-to-detect errors later on, it is advised to quickly check the synchronized input for each camera. First of all, slight imprecision in the temporal synchronization can be detrimental and lead to a lot of outliers and weird results. Additionally, if any camera has moved even just slightly during the calibration sequence, it should be removed entirely, since its observations will be ambiguous and can "poison" the pose estimates of all other cameras. Finally it can be beneficial to remove cameras where visibility of the calibration board is very unstable/poor or all detections of the calibration board only cover a very small part of the field of view.
 
@@ -101,7 +102,7 @@ python scripts/run.py --input-folder <path_to_images_or_videos> --intrinsics-fol
 For more fine-grained control over the process, the follwing parameters are available, with a short explanation of what the purpose of each is:
 
 **Help**
-- `-h`: 
+- `-h`: Show a help message listing all the parameters and a hint.
 
 **Required**
 - `--input-folder`: Path to the folder containing time-synchronized images or videos.
@@ -174,10 +175,7 @@ Additionally the following metrics are automatically generated and also stored i
   </tbody>
 </table>
 
-
-### 🚧 Troubleshooting
-
-TODO
+> Note: the final achievable reprojection error depends a lot on factors like the image resolution, precision of the setup, image quality, small-scale movement of cameras, etc. As an example, for a setup with 4k GoPros that are calibrated via checkerboard and charuco board, the lowest reprojection error is around 0.3-0.7 pixels.  
 
 ## 🎫 License
 
