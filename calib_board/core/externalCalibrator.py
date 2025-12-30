@@ -327,6 +327,10 @@ class ExternalCalibrator:
                 if np.isnan(point).any():
                     continue
 
+                # BUGFIX: apparently points can have coordinates that are slightly outside of (height, width) on rare occasions which leads to erroneous indices for the grid array!
+                point[0] = np.clip(point[0], a_min=0, a_max=width)
+                point[1] = np.clip(point[1], a_min=0, a_max=height)
+
                 # Map the point to a grid cell index.
                 x = int(np.ceil(K_l * point[0] / width)) - 1
                 y = int(np.ceil(K_l * point[1] / height)) - 1
