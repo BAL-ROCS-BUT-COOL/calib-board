@@ -61,6 +61,12 @@ class ExternalCalibrator:
         self.correspondences = copy.deepcopy(correspondences)
         self.intrinsics = intrinsics
 
+        # filtering correspondences for cameras that have no detections at all (would cause problems down the line)
+        for corr_key in list(self.correspondences.keys()):
+            if len(self.correspondences[corr_key]) == 0:
+                del self.correspondences[corr_key]
+                print(f"(!) removed camera [{corr_key}] since it has no detections / correspondences to start with...")
+
         # --- Solving Parameters ---
         self.config = config
         self.free_first = False
@@ -151,10 +157,18 @@ class ExternalCalibrator:
             self.add_checkers(cam_id)
             self.iterative_filtering()
 
+            # BUG?: I guess it can happen that one camera looses all correspondences due to filtering. technically every iteration for this case should be checked
+            
         if self.config.free_first:
             self.free_first = True
             print("Running BA with FREE first cam")
             self.iterative_filtering()
+
+        # BUGFIX: remove "orphaned correspondences"
+        for key in list(self.correspondences.keys()):
+            if key not in self.estimate.cameras:
+                del self.correspondences[key]
+                print(f"(!) removed orphaned correspondences for {key}")
 
         # 3. Finalization and Reporting.
         print("\n##################### CALIBRATION TERMINATED #####################")
@@ -266,10 +280,14 @@ class ExternalCalibrator:
                 score = self.view_score(
                     image_points_arr, self.intrinsics[cam1_id].resolution
                 )
+                
+                # only generate a score if there are actually some common image points
+                score = self.view_score(image_points_arr, self.intrinsics[cam1_id].resolution)
+                
             else:
+                
+                # if no common image points are found, score is just 0
                 score = 0
-
-            score = self.view_score(image_points_arr, self.intrinsics[cam1_id].resolution)
 
             if score > best_score:
                 best_score = score
